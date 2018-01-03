@@ -32,6 +32,22 @@ class Recognizer: NSObject {
         
     }
     
+    public func recognizeFaceIn(ciImage: CIImage) {
+        do {
+            try faceDetectionHandler.perform([faceDetectionRequest], on: ciImage)
+        } catch {
+            log.error(error)/
+        }
+    }
+    
+    public func recognizeFaceLandmarksIn(ciImage: CIImage) {
+        do {
+            try faceLandmarksHandler.perform([faceLandmarksRequest], on: ciImage)
+        } catch {
+            log.error(error)/
+        }
+    }
+    
     public func recognizeFaceIn(buffer: CVPixelBuffer) {
         do {
 //            log.word("entered")/

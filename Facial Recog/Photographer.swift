@@ -9,10 +9,12 @@
 import Foundation
 import AVFoundation
 import CoreVideo
+import CoreImage
 
 protocol PhotographerDelegate: class {
     func photographer(_ photographer: Photographer, didCapturePhotoBuffer buffer: CVPixelBuffer)
     func photographer(_ photographer: Photographer, didCaptureVideoBuffer buffer: CVPixelBuffer, at: CMTime)
+    func photographer(_ photographer: Photographer, didCaptureCIImage ciImage: CIImage, at: CMTime)
 }
 
 class Photographer: NSObject {
@@ -61,12 +63,12 @@ class Photographer: NSObject {
             
             let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
             previewLayer.videoGravity = .resizeAspect
-            previewLayer.connection?.videoOrientation = .portrait
+//            previewLayer.connection?.videoOrientation = .portrait
             self.previewLayer = previewLayer
             
             
             let videoSettings: [String: Any] = [
-                kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_32BGRA)
+                kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
             ]
             
             videoOutput.videoSettings = videoSettings
@@ -106,13 +108,8 @@ class Photographer: NSObject {
     
     func takeAPic() {
         let photoSettings = AVCapturePhotoSettings(format: [
-            kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_32BGRA)
+            kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
             ])
-        photoSettings.previewPhotoFormat = [
-            kCVPixelBufferPixelFormatTypeKey as String : photoSettings.availableEmbeddedThumbnailPhotoCodecTypes[0],
-            kCVPixelBufferWidthKey as String : 299,
-            kCVPixelBufferHeightKey as String : 299
-        ]
         
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
     }
@@ -132,8 +129,12 @@ extension Photographer: AVCaptureVideoDataOutputSampleBufferDelegate {
         let deltaTime = timestamp - latestTimeStamp
         if deltaTime >= CMTimeMake(1, Int32(FPS)) {
             latestTimeStamp = timestamp
-            
             let buffer = CMSampleBufferGetImageBuffer(sampleBuffer)
+
+            let attachments = CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate)
+            let ciImage = CIImage(cvImageBuffer: buffer!, options: attachments as! [String : Any]?)
+            
+//            delegate?.photographer(self, didCaptureCIImage: ciImage, at: timestamp)
             delegate?.photographer(self, didCaptureVideoBuffer: buffer!, at: timestamp)
         }
     }

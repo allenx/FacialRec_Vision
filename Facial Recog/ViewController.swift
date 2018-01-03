@@ -10,16 +10,23 @@ import UIKit
 import Vision
 import CoreML
 import CoreMedia
+import AVFoundation
+
+struct MetaData {
+    static let videoWidth: CGFloat = 360
+    static let videoHeight: CGFloat = 480
+}
 
 class ViewController: UIViewController {
     
     var photographer: Photographer!
     
     var currentBuffer: CVPixelBuffer?
-    var currentRectangle: [CAShapeLayer] = []
+    var currentRectangles: [CAShapeLayer] = []
     var currentLandmarks: [CAShapeLayer] = []
     
     var videoPreviewView: UIView!
+    var videoPreviewLayer: AVCaptureVideoPreviewLayer!
     
     let commandGroup = DispatchGroup()
     
@@ -49,8 +56,9 @@ class ViewController: UIViewController {
                 return
             }
             if let previewLayer = self.photographer.previewLayer {
+                self.videoPreviewLayer = previewLayer
                 self.videoPreviewView.layer.addSublayer(previewLayer)
-                self.photographer.previewLayer?.frame = self.videoPreviewView.bounds
+                self.videoPreviewLayer.frame = self.videoPreviewView.bounds
             }
             self.commandGroup.leave()
         }
@@ -85,7 +93,7 @@ extension ViewController {
     }
     
     fileprivate func didFinishLandmarksRecog(request: VNRequest, error: Error?) {
-//        log.word("done")/
+        //        log.word("done")/
         if let results = request.results as? [VNFaceObservation] {
             //            log.word("检测到 \(results.count) 张人脸")/
             DispatchQueue.main.async {
@@ -93,7 +101,7 @@ extension ViewController {
             }
             
         } else {
-            log.error(error!)
+            log.error(error!)/
         }
     }
 }
@@ -101,7 +109,7 @@ extension ViewController {
 // 在 View 上，通过检测到的结果绘制矩形框和五官的函数
 extension ViewController {
     fileprivate func drawRectangles(faceObservations: [VNFaceObservation]) {
-        currentRectangle.flatMap {
+        currentRectangles = currentRectangles.flatMap {
             rectangle in
             rectangle.removeFromSuperlayer()
             return nil
@@ -109,40 +117,44 @@ extension ViewController {
         for faceObservation in faceObservations {
             let boundingBox = faceObservation.boundingBox
             
-            let w = boundingBox.width * videoPreviewView.frame.size.width
-            let h = boundingBox.height * videoPreviewView.frame.size.height
-            let x = boundingBox.minX * videoPreviewView.frame.size.width
-            let y = (1 - boundingBox.minY) * videoPreviewView.frame.size.height - h
+            let w = boundingBox.width * MetaData.videoWidth
+            let h = boundingBox.height * MetaData.videoHeight
+            let x = boundingBox.minX * MetaData.videoWidth
+//            let y = (1 - boundingBox.minY) * MetaData.videoHeight - h
+            let y = boundingBox.minY * MetaData.videoHeight
             
             
             let rect = CGRect(x: x, y: y, width: w, height: h)
             let rectangle = CAShapeLayer()
+            rectangle.setAffineTransform(CGAffineTransform(scaleX: -1, y: -1))
             rectangle.frame = rect
             rectangle.borderWidth = 1.0
             rectangle.borderColor = UIColor.red.cgColor
             
             videoPreviewView.layer.addSublayer(rectangle)
-            currentRectangle.append(rectangle)
+            currentRectangles.append(rectangle)
         }
     }
     
     fileprivate func drawLandmarks(faceObservations: [VNFaceObservation]) {
-        drawRectangles(faceObservations: faceObservations)
-        currentLandmarks.flatMap {
+//        drawRectangles(faceObservations: faceObservations)
+        currentLandmarks = currentLandmarks.flatMap {
             landmark in
             landmark.removeFromSuperlayer()
             return nil
         }
+        
         for faceObservation in faceObservations {
             guard let landmarks = faceObservation.landmarks else {
                 continue
             }
             
             let boundingBox = faceObservation.boundingBox
-            let boxW = boundingBox.width * videoPreviewView.frame.size.width
-            let boxH = boundingBox.height * videoPreviewView.frame.size.height
-            let boxX = boundingBox.minX * videoPreviewView.frame.size.width
-            let boxY = (1 - boundingBox.minY) * videoPreviewView.frame.size.height - boxH
+            let boxW = boundingBox.width * MetaData.videoWidth
+            let boxH = boundingBox.height * MetaData.videoHeight
+            let boxX = boundingBox.minX * MetaData.videoWidth
+//            let boxY = (1 - boundingBox.minY) * MetaData.videoHeight - boxH
+            let boxY = boundingBox.minY * MetaData.videoHeight
             
             var regions: [VNFaceLandmarkRegion2D?] = []
             regions.append(landmarks.faceContour)
@@ -158,41 +170,49 @@ extension ViewController {
             regions.append(landmarks.leftPupil)
             regions.append(landmarks.rightPupil)
             
-            regions.flatMap({ region -> [CGPoint]? in
+            _ = regions.flatMap({ region -> [CGPoint]? in
                 guard region != nil else {
                     return nil
                 }
-                
-                var count = 0
                 
                 let regionLayer = CAShapeLayer()
                 
                 let path = UIBezierPath()
                 var transformedPoints: [CGPoint] = []
                 for (index, point) in region!.normalizedPoints.enumerated() {
-                    let fooPoint = CGPoint(x: point.x * boxW + boxX, y: point.y * boxH + boxY)
-                    index == 0 ? path.move(to: fooPoint) : path.addLine(to: fooPoint)
-                    if count == 0 {
-                        log.any(fooPoint)/
+                    var xRectification: CGFloat = 0
+                    var yRectification: CGFloat = 0
+                    
+                    if point.x < 0.5 {
+                        xRectification = 7.5 // (375 - 360) / 2
+                    } else if point.x > 0.5 {
+                        xRectification = 7.5
                     }
+                    if point.y < 0.5 {
+                        yRectification = 10.0 + 83.5 // (500 - 480) / 2 + (667 - 500) / 2
+                    } else if point.y > 0.5 {
+                        yRectification = 10.0 + 83.5
+                    }
+                    
+                    let fooPoint = CGPoint(x: point.x * boxW + boxX + xRectification, y: point.y * boxH + boxY + yRectification)
+                    index == 0 ? path.move(to: fooPoint) : path.addLine(to: fooPoint)
                     transformedPoints.append(fooPoint)
                 }
-                count += 1
+                path.lineJoinStyle = .round
+                path.lineCapStyle = .round
                 regionLayer.path = path.cgPath
                 regionLayer.fillColor = nil
                 regionLayer.strokeColor = UIColor.green.cgColor
-                regionLayer.lineWidth = 1.0
+                regionLayer.lineWidth = 1.5
                 regionLayer.opacity = 1.0
-//                var t = CATransform3DIdentity
-//                t = CATransform3DRotate(t, CGFloat.pi, 0.5, 1.0, 0.0)
-//                regionLayer.transform = t
-                regionLayer.transform = CATransform3DMakeRotation(.pi, 0.0, 0.0, 1.0)
+                regionLayer.setAffineTransform(CGAffineTransform(scaleX: -1, y: -1))
+                regionLayer.frame = videoPreviewLayer.frame
                 currentLandmarks.append(regionLayer)
-                videoPreviewView.layer.addSublayer(regionLayer)
-                
+                videoPreviewLayer.addSublayer(regionLayer)
+
                 return transformedPoints
             })
-
+            
         }
     }
     
@@ -200,6 +220,12 @@ extension ViewController {
 
 // 相机的 Delegate 实现
 extension ViewController: PhotographerDelegate {
+    func photographer(_ photographer: Photographer, didCaptureCIImage ciImage: CIImage, at: CMTime) {
+        //leftMirrored for front camera
+//        let ciImageWithOrientation = ciImage.oriented(forExifOrientation: Int32(UIImageOrientation.leftMirrored.rawValue))
+//        self.recognizer.recognizeFaceLandmarksIn(ciImage: ciImageWithOrientation)
+    }
+    
     func photographer(_ photographer: Photographer, didCapturePhotoBuffer buffer: CVPixelBuffer) {
         //        self.currentBuffer = buffer
         //        print("fuck")
@@ -207,9 +233,9 @@ extension ViewController: PhotographerDelegate {
     }
     
     func photographer(_ photographer: Photographer, didCaptureVideoBuffer buffer: CVPixelBuffer, at: CMTime) {
-        self.currentBuffer = buffer
-        //        self.recognizer.recognizeFaceIn(buffer: self.currentBuffer!)
-        self.recognizer.recognizeFaceLandmarksIn(buffer: self.currentBuffer!)
+                self.currentBuffer = buffer
+                //        self.recognizer.recognizeFaceIn(buffer: self.currentBuffer!)
+                self.recognizer.recognizeFaceLandmarksIn(buffer: self.currentBuffer!)
     }
     
     
