@@ -12,6 +12,10 @@ import CoreML
 
 class Recognizer: NSObject {
     
+//    var openface: OpenFace!
+    
+    var allenNetRequest: [VNRequest]!
+    
     var faceLandmarksHandler: VNSequenceRequestHandler!
     var faceDetectionHandler: VNSequenceRequestHandler!
     
@@ -25,10 +29,20 @@ class Recognizer: NSObject {
         super.init()
     }
     
-    public convenience init(landmarksCompletionBlock: VNRequestCompletionHandler?, faceCompletionBlock: VNRequestCompletionHandler?) {
+    public convenience init(landmarksCompletionBlock: VNRequestCompletionHandler?, faceCompletionBlock: VNRequestCompletionHandler?, allenCompletionBlock: VNRequestCompletionHandler?) {
         self.init()
         faceLandmarksRequest = VNDetectFaceLandmarksRequest(completionHandler: landmarksCompletionBlock)
         faceDetectionRequest = VNDetectFaceRectanglesRequest(completionHandler: faceCompletionBlock)
+        do {
+            // Load the Custom Vision model.
+            // To add a new model, drag it to the Xcode project browser making sure that the "Target Membership" is checked.
+            // Then update the following line with the name of your new model.
+            let model = try VNCoreMLModel(for: allen().model)
+            let fooRequest = VNCoreMLRequest(model: model, completionHandler: allenCompletionBlock)
+            allenNetRequest = [fooRequest]
+        } catch {
+            fatalError("Can't load Vision ML model: \(error)")
+        }
         
     }
     
@@ -38,6 +52,8 @@ class Recognizer: NSObject {
         } catch {
             log.error(error)/
         }
+        
+        
     }
     
     public func recognizeFaceLandmarksIn(ciImage: CIImage) {
@@ -56,11 +72,25 @@ class Recognizer: NSObject {
         } catch {
             print(error)
         }
+        
+        do {
+            let allenRequestHandler = VNImageRequestHandler(cvPixelBuffer: buffer.croppedTo(width: 227, height: 227), options: [:])
+            try allenRequestHandler.perform(allenNetRequest)
+        } catch {
+            print(error)
+        }
     }
     
     public func recognizeFaceLandmarksIn(buffer: CVPixelBuffer) {
         do {
             try faceLandmarksHandler.perform([faceLandmarksRequest], on: buffer)
+        } catch {
+            print(error)
+        }
+        
+        do {
+            let allenRequestHandler = VNImageRequestHandler(cvPixelBuffer: buffer.croppedTo(width: 227, height: 227), options: [:])
+            try allenRequestHandler.perform(allenNetRequest)
         } catch {
             print(error)
         }

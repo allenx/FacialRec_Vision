@@ -2,7 +2,7 @@
 //  Photographer.swift
 //  Facial Recog
 //
-//  Created by Allen X on 8/6/18.
+//  Created by Allen X on 8/6/17.
 //  Copyright © 2018 allenx. All rights reserved.
 //
 
@@ -20,7 +20,7 @@ protocol PhotographerDelegate: class {
 class Photographer: NSObject {
     var previewLayer: AVCaptureVideoPreviewLayer?
     weak var delegate: PhotographerDelegate?
-    var FPS = 20
+    var FPS = 30
     let captureSession = AVCaptureSession()
     let photoOutput = AVCapturePhotoOutput()
     let videoOutput = AVCaptureVideoDataOutput()
@@ -68,7 +68,8 @@ class Photographer: NSObject {
             
             
             let videoSettings: [String: Any] = [
-                kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
+//                kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
+                kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_32BGRA)
             ]
             
             videoOutput.videoSettings = videoSettings
@@ -131,8 +132,8 @@ extension Photographer: AVCaptureVideoDataOutputSampleBufferDelegate {
             latestTimeStamp = timestamp
             let buffer = CMSampleBufferGetImageBuffer(sampleBuffer)
 
-            let attachments = CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate)
-            let ciImage = CIImage(cvImageBuffer: buffer!, options: attachments as! [String : Any]?)
+//            let attachments = CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate)
+//            let ciImage = CIImage(cvImageBuffer: buffer!, options: attachments as! [String : Any]?)
             
 //            delegate?.photographer(self, didCaptureCIImage: ciImage, at: timestamp)
             delegate?.photographer(self, didCaptureVideoBuffer: buffer!, at: timestamp)

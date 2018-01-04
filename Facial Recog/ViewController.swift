@@ -25,6 +25,8 @@ class ViewController: UIViewController {
     var currentRectangles: [CAShapeLayer] = []
     var currentLandmarks: [CAShapeLayer] = []
     
+    var didDetectAllen: Bool = false
+    
     var videoPreviewView: UIView!
     var videoPreviewLayer: AVCaptureVideoPreviewLayer!
     
@@ -35,13 +37,15 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         view.backgroundColor = .black
         videoPreviewView = UIView(frame: view.frame)
         view.addSubview(videoPreviewView)
         
         recognizer = Recognizer(
             landmarksCompletionBlock: self.didFinishLandmarksRecog,
-            faceCompletionBlock: self.didFinishFaceRecog
+            faceCompletionBlock: self.didFinishFaceRecog,
+            allenCompletionBlock: self.didFinishDetectingAllen
         )
         
         
@@ -104,6 +108,21 @@ extension ViewController {
             log.error(error!)/
         }
     }
+    
+    fileprivate func didFinishDetectingAllen(request: VNRequest, error: Error?) {
+        if let results = request.results as? [VNClassificationObservation] {
+            if let best = results.first {
+                if best.identifier.starts(with: "Allen") && best.confidence > 0.7 {
+                    didDetectAllen = true
+                }
+            } else {
+                log.word("fuck")/
+            }
+        } else {
+            didDetectAllen = false
+            log.error(error!)/
+        }
+    }
 }
 
 // 在 View 上，通过检测到的结果绘制矩形框和五官的函数
@@ -117,17 +136,17 @@ extension ViewController {
         for faceObservation in faceObservations {
             let boundingBox = faceObservation.boundingBox
             
-            let w = boundingBox.width * MetaData.videoWidth
-            let h = boundingBox.height * MetaData.videoHeight
-            let x = boundingBox.minX * MetaData.videoWidth
-//            let y = (1 - boundingBox.minY) * MetaData.videoHeight - h
-            let y = boundingBox.minY * MetaData.videoHeight
+            let w = boundingBox.width * 375
+            let h = boundingBox.height * 500
+            let x = boundingBox.minX * 375 - 7.5
+            let y = (1 - boundingBox.minY) * 500 - h + 83.5 + 10
+            //            let y = boundingBox.minY * MetaData.videoHeight
             
             
             let rect = CGRect(x: x, y: y, width: w, height: h)
             let rectangle = CAShapeLayer()
-            rectangle.setAffineTransform(CGAffineTransform(scaleX: -1, y: -1))
             rectangle.frame = rect
+            //            rectangle.setAffineTransform(CGAffineTransform(scaleX: -1, y: -1))
             rectangle.borderWidth = 1.0
             rectangle.borderColor = UIColor.red.cgColor
             
@@ -137,7 +156,7 @@ extension ViewController {
     }
     
     fileprivate func drawLandmarks(faceObservations: [VNFaceObservation]) {
-//        drawRectangles(faceObservations: faceObservations)
+        //        drawRectangles(faceObservations: faceObservations)
         currentLandmarks = currentLandmarks.flatMap {
             landmark in
             landmark.removeFromSuperlayer()
@@ -153,8 +172,25 @@ extension ViewController {
             let boxW = boundingBox.width * MetaData.videoWidth
             let boxH = boundingBox.height * MetaData.videoHeight
             let boxX = boundingBox.minX * MetaData.videoWidth
-//            let boxY = (1 - boundingBox.minY) * MetaData.videoHeight - boxH
+            //            let boxY = (1 - boundingBox.minY) * MetaData.videoHeight - boxH
             let boxY = boundingBox.minY * MetaData.videoHeight
+            
+            if didDetectAllen {
+                let nameLabel = UILabel(text: "Allen", fontSize: 14)
+                nameLabel.tag = 9
+                nameLabel.textColor = .white
+                let avatarView = UIImageView(imageName: "allen", desiredSize: CGSize(width: 50, height: 50))
+                avatarView?.tag = 10
+                avatarView?.frame = CGRect(x: boxX+boxW+10, y: (1 - boundingBox.minY) * MetaData.videoHeight - boxH, width: 50, height: 50)
+                nameLabel.frame = CGRect(x: boxX+boxW+10, y: (avatarView?.frame.origin.y)!+56, width: 66, height: 14)
+                for subview in videoPreviewView.subviews {
+                    if subview.tag == 9 || subview.tag == 10 {
+                        subview.removeFromSuperview()
+                    }
+                }
+                videoPreviewView.addSubview(avatarView!)
+                videoPreviewView.addSubview(nameLabel)
+            }
             
             var regions: [VNFaceLandmarkRegion2D?] = []
             regions.append(landmarks.faceContour)
@@ -209,7 +245,7 @@ extension ViewController {
                 regionLayer.frame = videoPreviewLayer.frame
                 currentLandmarks.append(regionLayer)
                 videoPreviewLayer.addSublayer(regionLayer)
-
+                
                 return transformedPoints
             })
             
@@ -222,8 +258,8 @@ extension ViewController {
 extension ViewController: PhotographerDelegate {
     func photographer(_ photographer: Photographer, didCaptureCIImage ciImage: CIImage, at: CMTime) {
         //leftMirrored for front camera
-//        let ciImageWithOrientation = ciImage.oriented(forExifOrientation: Int32(UIImageOrientation.leftMirrored.rawValue))
-//        self.recognizer.recognizeFaceLandmarksIn(ciImage: ciImageWithOrientation)
+        //        let ciImageWithOrientation = ciImage.oriented(forExifOrientation: Int32(UIImageOrientation.leftMirrored.rawValue))
+        //        self.recognizer.recognizeFaceLandmarksIn(ciImage: ciImageWithOrientation)
     }
     
     func photographer(_ photographer: Photographer, didCapturePhotoBuffer buffer: CVPixelBuffer) {
@@ -233,10 +269,8 @@ extension ViewController: PhotographerDelegate {
     }
     
     func photographer(_ photographer: Photographer, didCaptureVideoBuffer buffer: CVPixelBuffer, at: CMTime) {
-                self.currentBuffer = buffer
-                //        self.recognizer.recognizeFaceIn(buffer: self.currentBuffer!)
-                self.recognizer.recognizeFaceLandmarksIn(buffer: self.currentBuffer!)
+        self.currentBuffer = buffer
+        //        self.recognizer.recognizeFaceIn(buffer: self.currentBuffer!)
+        self.recognizer.recognizeFaceLandmarksIn(buffer: self.currentBuffer!)
     }
-    
-    
 }

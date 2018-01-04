@@ -17,6 +17,7 @@
 		B12D8FEE1FFB88BC00F4FB33 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B12D8FED1FFB88BC00F4FB33 /* Assets.xcassets */; };
 		B12D8FF11FFB88BC00F4FB33 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B12D8FEF1FFB88BC00F4FB33 /* LaunchScreen.storyboard */; };
 		B12D8FF91FFB88E800F4FB33 /* OpenFace.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B12D8FF81FFB88E800F4FB33 /* OpenFace.mlmodel */; };
+		B1439A381FFE990600E9283E /* allen.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B1439A371FFE990600E9283E /* allen.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		B12D8FF01FFB88BC00F4FB33 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B12D8FF21FFB88BC00F4FB33 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B12D8FF81FFB88E800F4FB33 /* OpenFace.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = OpenFace.mlmodel; sourceTree = "<group>"; };
+		B1439A371FFE990600E9283E /* allen.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = allen.mlmodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 		B12D8FE51FFB88BC00F4FB33 /* Facial Recog */ = {
 			isa = PBXGroup;
 			children = (
+				B1439A371FFE990600E9283E /* allen.mlmodel */,
 				B12D8FF81FFB88E800F4FB33 /* OpenFace.mlmodel */,
 				B109B5341FFBFE9800133C01 /* log.swift */,
 				B109B5301FFB9C6100133C01 /* ClassExtensions.swift */,
@@ -152,6 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B109B5311FFB9C6100133C01 /* ClassExtensions.swift in Sources */,
+				B1439A381FFE990600E9283E /* allen.mlmodel in Sources */,
 				B109B52E1FFB9A5B00133C01 /* Photographer.swift in Sources */,
 				B12D8FE91FFB88BC00F4FB33 /* ViewController.swift in Sources */,
 				B109B5331FFB9FBC00133C01 /* Recognizer.swift in Sources */,

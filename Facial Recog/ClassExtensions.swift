@@ -384,9 +384,9 @@ extension UIImage {
     func pixelBuffer() -> CVPixelBuffer? {
         //Reference: https://github.com/cieslak/CoreMLCrap/blob/master/MachineLearning/ViewController.swift#L42
         var pixelBuffer : CVPixelBuffer?
-        let imageDimension : CGFloat = 299.0
+//        let imageDimension : CGFloat = 299.0
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-        let imageSize = CGSize(width:imageDimension, height:imageDimension)
+        let imageSize = CGSize(width:self.size.width, height:self.size.height)
         let imageRect = CGRect(origin: CGPoint(x:0, y:0), size: imageSize)
         
         let options = [kCVPixelBufferCGImageCompatibilityKey: kCFBooleanTrue,
@@ -470,16 +470,14 @@ extension CVPixelBuffer {
         return copy
     }
     
-    func cropped() -> CVPixelBuffer {
+    func croppedTo(width: Int, height: Int) -> CVPixelBuffer {
         CVPixelBufferLockBaseAddress(self, .readOnly)
         
         let baseAddress = CVPixelBufferGetBaseAddress(self)
         let bytesPerRow = CVPixelBufferGetBytesPerRow(self)
-        let cropWidth = 299
-        let cropHeight = 299
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         
-        let context = CGContext(data: baseAddress, width: cropWidth, height: cropHeight, bitsPerComponent: 8, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)
+        let context = CGContext(data: baseAddress, width: width, height: height, bitsPerComponent: 8, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)
         
         CVPixelBufferUnlockBaseAddress(self, .readOnly)
         
