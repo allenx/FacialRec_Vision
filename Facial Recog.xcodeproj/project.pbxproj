@@ -16,8 +16,14 @@
 		B12D8FEC1FFB88BC00F4FB33 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B12D8FEA1FFB88BC00F4FB33 /* Main.storyboard */; };
 		B12D8FEE1FFB88BC00F4FB33 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B12D8FED1FFB88BC00F4FB33 /* Assets.xcassets */; };
 		B12D8FF11FFB88BC00F4FB33 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B12D8FEF1FFB88BC00F4FB33 /* LaunchScreen.storyboard */; };
-		B12D8FF91FFB88E800F4FB33 /* OpenFace.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B12D8FF81FFB88E800F4FB33 /* OpenFace.mlmodel */; };
-		B1439A381FFE990600E9283E /* allen.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B1439A371FFE990600E9283E /* allen.mlmodel */; };
+		B15A20CE200037E700077254 /* allen.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B15A20CC200037E700077254 /* allen.mlmodel */; };
+		B15A20CF200037E700077254 /* OpenFace.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B15A20CD200037E700077254 /* OpenFace.mlmodel */; };
+		B15A20D4200037F200077254 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A20D1200037F100077254 /* Operators.swift */; };
+		B15A20D5200037F200077254 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A20D2200037F100077254 /* Vector.swift */; };
+		B15A20D6200037F200077254 /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A20D3200037F100077254 /* Matrix.swift */; };
+		B160DB6F20008DE900500035 /* OFClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B160DB6E20008DE900500035 /* OFClassifier.mlmodel */; };
+		B160DB7220009E4B00500035 /* labels.csv in Resources */ = {isa = PBXBuildFile; fileRef = B160DB7020009E4A00500035 /* labels.csv */; };
+		B160DB7320009E4B00500035 /* reps.csv in Resources */ = {isa = PBXBuildFile; fileRef = B160DB7120009E4B00500035 /* reps.csv */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,8 +38,14 @@
 		B12D8FED1FFB88BC00F4FB33 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B12D8FF01FFB88BC00F4FB33 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B12D8FF21FFB88BC00F4FB33 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B12D8FF81FFB88E800F4FB33 /* OpenFace.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = OpenFace.mlmodel; sourceTree = "<group>"; };
-		B1439A371FFE990600E9283E /* allen.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = allen.mlmodel; sourceTree = "<group>"; };
+		B15A20CC200037E700077254 /* allen.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = allen.mlmodel; sourceTree = "<group>"; };
+		B15A20CD200037E700077254 /* OpenFace.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = OpenFace.mlmodel; sourceTree = "<group>"; };
+		B15A20D1200037F100077254 /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
+		B15A20D2200037F100077254 /* Vector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector.swift; sourceTree = "<group>"; };
+		B15A20D3200037F100077254 /* Matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matrix.swift; sourceTree = "<group>"; };
+		B160DB6E20008DE900500035 /* OFClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = OFClassifier.mlmodel; sourceTree = "<group>"; };
+		B160DB7020009E4A00500035 /* labels.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels.csv; sourceTree = "<group>"; };
+		B160DB7120009E4B00500035 /* reps.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = reps.csv; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,8 +78,8 @@
 		B12D8FE51FFB88BC00F4FB33 /* Facial Recog */ = {
 			isa = PBXGroup;
 			children = (
-				B1439A371FFE990600E9283E /* allen.mlmodel */,
-				B12D8FF81FFB88E800F4FB33 /* OpenFace.mlmodel */,
+				B15A20CB200037E700077254 /* Models */,
+				B15A20D0200037F100077254 /* Freud */,
 				B109B5341FFBFE9800133C01 /* log.swift */,
 				B109B5301FFB9C6100133C01 /* ClassExtensions.swift */,
 				B12D8FE61FFB88BC00F4FB33 /* AppDelegate.swift */,
@@ -80,6 +92,28 @@
 				B12D8FF21FFB88BC00F4FB33 /* Info.plist */,
 			);
 			path = "Facial Recog";
+			sourceTree = "<group>";
+		};
+		B15A20CB200037E700077254 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B160DB7020009E4A00500035 /* labels.csv */,
+				B160DB7120009E4B00500035 /* reps.csv */,
+				B160DB6E20008DE900500035 /* OFClassifier.mlmodel */,
+				B15A20CC200037E700077254 /* allen.mlmodel */,
+				B15A20CD200037E700077254 /* OpenFace.mlmodel */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B15A20D0200037F100077254 /* Freud */ = {
+			isa = PBXGroup;
+			children = (
+				B15A20D1200037F100077254 /* Operators.swift */,
+				B15A20D2200037F100077254 /* Vector.swift */,
+				B15A20D3200037F100077254 /* Matrix.swift */,
+			);
+			path = Freud;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,7 +177,9 @@
 			files = (
 				B12D8FF11FFB88BC00F4FB33 /* LaunchScreen.storyboard in Resources */,
 				B12D8FEE1FFB88BC00F4FB33 /* Assets.xcassets in Resources */,
+				B160DB7320009E4B00500035 /* reps.csv in Resources */,
 				B12D8FEC1FFB88BC00F4FB33 /* Main.storyboard in Resources */,
+				B160DB7220009E4B00500035 /* labels.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,14 +190,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B15A20CE200037E700077254 /* allen.mlmodel in Sources */,
+				B15A20CF200037E700077254 /* OpenFace.mlmodel in Sources */,
+				B160DB6F20008DE900500035 /* OFClassifier.mlmodel in Sources */,
+				B15A20D5200037F200077254 /* Vector.swift in Sources */,
 				B109B5311FFB9C6100133C01 /* ClassExtensions.swift in Sources */,
-				B1439A381FFE990600E9283E /* allen.mlmodel in Sources */,
 				B109B52E1FFB9A5B00133C01 /* Photographer.swift in Sources */,
+				B15A20D6200037F200077254 /* Matrix.swift in Sources */,
 				B12D8FE91FFB88BC00F4FB33 /* ViewController.swift in Sources */,
 				B109B5331FFB9FBC00133C01 /* Recognizer.swift in Sources */,
-				B12D8FF91FFB88E800F4FB33 /* OpenFace.mlmodel in Sources */,
 				B109B5351FFBFE9800133C01 /* log.swift in Sources */,
 				B12D8FE71FFB88BC00F4FB33 /* AppDelegate.swift in Sources */,
+				B15A20D4200037F200077254 /* Operators.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

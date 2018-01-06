@@ -1,12 +1,13 @@
 //
 //  log.swift
-//  WePeiYang
+//
 //
 //  Created by Allen X on 8/8/16.
-//  Copyright © 2016 Qin Yubo. All rights reserved.
+//  Copyright © 2016 allenx. All rights reserved.
 //
 
 //TODO: Make this only availible in Debug Mode because printing actually stalls the app
+// 这是一个工具函数，可以让 print 更醒目
 import Foundation
 
 enum log {

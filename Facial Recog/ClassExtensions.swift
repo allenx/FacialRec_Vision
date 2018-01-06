@@ -1,15 +1,18 @@
 //
 //  ClassExtensions.swift
-//  ShazamForImages
+//  
 //
 //  Created by Allen X on 6/3/17.
 //  Copyright © 2017 allenx. All rights reserved.
 //
 
+// 这个文件是我给很多类写的 extension，加了很多有用的工具函数
+
 import Foundation
 import UIKit
 import CoreVideo
 import AVFoundation
+import CoreML
 
 extension UILabel {
     convenience init(text: String, color: UIColor) {
@@ -384,7 +387,6 @@ extension UIImage {
     func pixelBuffer() -> CVPixelBuffer? {
         //Reference: https://github.com/cieslak/CoreMLCrap/blob/master/MachineLearning/ViewController.swift#L42
         var pixelBuffer : CVPixelBuffer?
-//        let imageDimension : CGFloat = 299.0
         let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
         let imageSize = CGSize(width:self.size.width, height:self.size.height)
         let imageRect = CGRect(origin: CGPoint(x:0, y:0), size: imageSize)
@@ -485,5 +487,13 @@ extension CVPixelBuffer {
         let cgImage: CGImage = context!.makeImage()!
         let image = UIImage(cgImage: cgImage)
         return image.pixelBuffer()!
+    }
+}
+
+extension MLMultiArray {
+    func array<T>(type: T.Type) -> [T] {
+        let pointer = dataPointer.bindMemory(to: T.self, capacity: count)
+        let buffer = UnsafeBufferPointer(start: pointer, count: count)
+        return Array(buffer)
     }
 }
